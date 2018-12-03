@@ -2,7 +2,7 @@ import threading
 import time
 import random
 
-queue = [] # NOT THREAD SAFE
+_queue = [] # NOT THREAD SAFE
 MAX_ITEMS = 10
 condition = threading.Condition()
 
@@ -10,17 +10,17 @@ condition = threading.Condition()
 class ProducerThread(threading.Thread):
     def run(self):
         numbers = range(MAX_ITEMS)  # Generate num in 0..5
-        global queue  # Global queue
+        global _queue  # Global queue
 
         while True:
             condition.acquire()
-            if len(queue) >= MAX_ITEMS:
+            if len(_queue) >= MAX_ITEMS:
                 print("Queue is full, producer is waiting")
                 condition.wait()  # If full, just wait
                 print("Space in queue, Consumer notified producer")
             number = random.choice(numbers)
-            queue.append(number)
-            print("Produced {}, queue: {}".format(number, queue))
+            _queue.append(number)
+            print("Produced {}, queue: {}".format(number, _queue))
             condition.notify()  # Notify consumers
             condition.release()
             time.sleep(random.random())
@@ -28,15 +28,15 @@ class ProducerThread(threading.Thread):
 
 class ConsumerThread(threading.Thread):
     def run(self):
-        global queue
+        global _queue
         while True:
             condition.acquire()
-            if not queue:
+            if not _queue:
                 print("Nothing in queue, consumer is waiting")
                 condition.wait()
                 print("Producer added something to queue and notified consumer")
-            number = queue.pop(0)
-            print("Consumed {}, queue: {}".format(number, queue))
+            number = _queue.pop(0)
+            print("Consumed {}, queue: {}".format(number, _queue))
             condition.notify()  # Notify producer
             condition.release()
             time.sleep(random.random())
