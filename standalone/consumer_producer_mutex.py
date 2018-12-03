@@ -13,7 +13,7 @@ import threading
 counter_buffer = 0
 counter_lock = threading.Lock()
 
-COUNTER_MAX = 100
+COUNTER_MAX = 1000000
 
 def consumer1_counter():
     global counter_buffer
@@ -31,14 +31,26 @@ def consumer2_counter():
         counter_buffer += 1
         counter_lock.release()
 
+def consumer3_counter():
+    global counter_buffer
+    for i in range(COUNTER_MAX):
+        counter_lock.acquire()
+        #Critical section
+        counter_buffer += 1
+        counter_lock.release()
+
 if __name__ == "__main__":
     t1 = threading.Thread(target=consumer1_counter)
     t2 = threading.Thread(target=consumer2_counter)
+    t3 = threading.Thread(target=consumer3_counter)
 
     t1.start()
     t2.start()
+    t3.start()
 
+    # Join to main thread
     t1.join()
     t2.join()
+    t3.join()
 
     print("Final counter buffer is {}".format(counter_buffer))
