@@ -15,12 +15,15 @@ We will build distributed applications on python, including async tasks, multith
 * Also, on redis docker page you can see how to configure the containter for your needs
 * To start Redis container with persistent storage:
 ```
-docker run -v ~/Documents/redis-data/:/data --name aw-redis -d redis redis-server --appendonly yes
+docker run -p 6379:6379 -v ~/Documents/redis-data/:/data --name aw-redis -d redis redis-server --appendonly yes
 ```
     
 This command will run docker container with Redis and share a directory between docker container and host machine.
 
-### Tasks
+#### Tasks
 1. Blocking 
 2. Non-blocking
 3. Consumer producer problem
+
+#### Bugs
+1. When running celery on redis 3.*, you can face a problem [AttributeError: 'float' object has no attribute 'items'](https://github.com/celery/celery/issues/5175), just install `redis==2.10.6` 
