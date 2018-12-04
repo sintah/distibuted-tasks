@@ -26,4 +26,5 @@ This command will run docker container with Redis and share a directory between 
 3. Consumer producer problem
 
 #### Bugs
-1. When running celery on redis 3.*, you can face a problem [AttributeError: 'float' object has no attribute 'items'](https://github.com/celery/celery/issues/5175), just install `redis==2.10.6` 
+1. When running celery on redis 3.*, you can face a problem [AttributeError: 'float' object has no attribute 'items'](https://github.com/celery/celery/issues/5175), just install `redis==2.10.6`
+ 

@@ -2,6 +2,7 @@ from celery import Celery
 from celery.schedules import crontab
 from datetime import timedelta
 import time
+import redis
 
 # Run with: celery -A intro_task worker --loglevel=info
 # To run periodic tasks: celery -A intro_task beat --loglevel=info
@@ -35,19 +36,31 @@ def data_extractor(self):
         raise self.retry(exc=e, countdown=backoff(self.request.retries))
 
 
-@app.task(name="tasks.send.email")
-def send_mail_from_queue():
+key = "ABCCCC1231238123712636AAC"
+
+
+@app.task(bind=True, name="tasks.send.email")
+def send_mail_from_queue(self):
+    REDIS_CLIENT = redis.Redis()
+    timeout = 60 * 5  # Lock expires in 5 min
+    have_lock = False
+    my_lock = REDIS_CLIENT.lock(key, timeout=timeout)
     try:
-        messages_sent = "example@mail.ex"
-        print("Email message successfully send, [{}]".format(messages_sent))
+        have_lock = my_lock.acquire(blocking=False)
+        if have_lock:
+            messages_sent = "example@mail.ex"
+            print("Worker: {} \t Email message successfully send, [{}]".format(self.request.hostname, messages_sent))
+            time.sleep(10)
     finally:
         print("Release resources")
+        if have_lock:
+            my_lock.release()
 
 
 app.conf.beat_schedule = {
     'add-every-30-seconds': {
         'task':     'tasks.send.email',
-        'schedule': 5.0
+        'schedule': timedelta(seconds=5)
     },
 }
 app.conf.timezone = 'UTC'
