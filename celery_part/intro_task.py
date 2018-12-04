@@ -1,7 +1,10 @@
 from celery import Celery
+from celery.schedules import crontab
+from datetime import timedelta
 import time
 
-# Run with celery -A intro_task worker --loglevel=info
+# Run with: celery -A intro_task worker --loglevel=info
+# To run periodic tasks: celery -A intro_task beat --loglevel=info
 app = Celery('tasks', backend='redis://localhost:6379/0', broker='redis://localhost:6379/0')
 
 
@@ -30,3 +33,21 @@ def data_extractor(self):
     except Exception as e:
         print("There was an exception, try again after 5 sec")
         raise self.retry(exc=e, countdown=backoff(self.request.retries))
+
+
+@app.task(name="tasks.send.email")
+def send_mail_from_queue():
+    try:
+        messages_sent = "example@mail.ex"
+        print("Email message successfully send, [{}]".format(messages_sent))
+    finally:
+        print("Release resources")
+
+
+app.conf.beat_schedule = {
+    'add-every-30-seconds': {
+        'task':     'tasks.send.email',
+        'schedule': 5.0
+    },
+}
+app.conf.timezone = 'UTC'
