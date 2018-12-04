@@ -7,9 +7,11 @@ import time
 
 _basedir = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(_basedir)
-from celery_intro_task import add
+from intro_task import data_extractor
 
-result = add.delay(1, 2)
+
+# Run after intro_task.py, to run: python celery_part/exception_handling.py
+result = data_extractor.delay()
 seconds = 0
 while True:
     _result2 = AsyncResult(result.task_id)
