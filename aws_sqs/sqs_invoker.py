@@ -1,9 +1,9 @@
 import boto3
 import json
 import uuid
-from .aws_config import ACCESS_KEY, _QUEUE_URL, SECURITY_KEY
+from aws_sqs.aws_config import ACCESS_KEY, _QUEUE_URL, SECURITY_KEY
 
-# To run python -m aws_sqs/sqs_invoker.py
+# To run python -m aws_sqs.sqs_invoker
 sqs = boto3.client('sqs',
                    region_name='eu-central-1',
                    aws_access_key_id=ACCESS_KEY,
@@ -47,4 +47,5 @@ def send_report_results():
     print('SUCCESS')
 
 
-send_report_results()
+if __name__ == "__main__":
+    send_report_results()
