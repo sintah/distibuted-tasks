@@ -1,4 +1,4 @@
-amqp==2.3.2
+#amqp==2.3.2
 asn1crypto==0.24.0
 attrs==18.2.0
 Automat==0.7.0
@@ -10,6 +10,7 @@ cryptography==2.4.2
 cssselect==1.0.3
 hyperlink==18.0.0
 idna==2.7
+boto3
 incremental==17.5.0
 kombu==4.2.1
 lxml==4.2.5
