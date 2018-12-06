@@ -20,10 +20,10 @@ docker run -p 6379:6379 -v ~/Documents/redis-data/:/data --name aw-redis -d redi
     
 This command will run docker container with Redis and share a directory between docker container and host machine.
 
-#### Tasks
-1. Blocking 
-2. Non-blocking
-3. Consumer producer problem
+#### Parts
+1. Pure python
+2. Celery
+3. Amazon Web Services SQS
 
 #### Bugs
 1. When running celery on redis 3.*, you can face a problem [AttributeError: 'float' object has no attribute 'items'](https://github.com/celery/celery/issues/5175), just install `redis==2.10.6`
