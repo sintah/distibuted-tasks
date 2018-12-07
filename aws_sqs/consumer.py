@@ -1,10 +1,8 @@
 import boto3
 import json
-import uuid
-import time
-from .aws_config import ACCESS_KEY, _QUEUE_URL, SECURITY_KEY
+from .aws_config import ACCESS_KEY, QUEUE_URL, SECURITY_KEY
 
-# To run python -m aws_sqs.sqs_consumer
+# To run python -m aws_sqs.consumer
 sqs = boto3.client('sqs',
                    region_name='eu-central-1',
                    aws_access_key_id=ACCESS_KEY,
@@ -12,10 +10,10 @@ sqs = boto3.client('sqs',
                    )
 
 if __name__ == "__main__":
-    print("Starting worker listening on {}".format(_QUEUE_URL))
+    print("Starting worker listening on {}".format(QUEUE_URL))
     while True:
         response = sqs.receive_message(
-            QueueUrl=_QUEUE_URL,
+            QueueUrl=QUEUE_URL,
             AttributeNames=['All'],
             MessageAttributeNames=[
                 'string',
@@ -34,9 +32,8 @@ if __name__ == "__main__":
                     job_id = body['jobId']
                     print("Running Job Id {}".format(job_id))
                 print('Received and deleted message: {}'.format(message))
+                sqs.delete_message(QueueUrl=QUEUE_URL, ReceiptHandle=message.get('ReceiptHandle'))
             except Exception as e:
                 print("Exception in worker > ", e)
-            finally:
-                sqs.delete_message(QueueUrl=_QUEUE_URL, ReceiptHandle=message.get('ReceiptHandle'))
-            time.sleep(10)
-print("Stopped")
+                # Do nothing, so AWS SQS will move the dead letter to dead letter queue
+print("Stopped consumer")
